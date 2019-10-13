@@ -85,4 +85,30 @@
         </Button>
     </LinearLayout>
 
+    <EditText
+        android:id="@+id/speakText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxHeight="100dp"
+        android:hint="Enter Some Text..."
+        android:textColorHint="@color/darkish"
+        android:textColor="@color/darkish"
+        android:textSize="15dp"
+        android:padding="20dp"
+        android:layout_margin="5dp"
+        android:background="@drawable/background_button_patch">
+    </EditText>
+
+    <Button
+        android:id="@+id/speakButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Speak it"
+        android:textColor="@color/darkish"
+        android:textSize="15dp"
+        android:padding="20dp"
+        android:layout_margin="5dp"
+        android:background="@drawable/background_button_patch">
+    </Button>
+
 </LinearLayout>

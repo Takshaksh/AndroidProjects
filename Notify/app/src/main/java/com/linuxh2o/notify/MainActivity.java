@@ -6,19 +6,22 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.Toast;
-
 import com.google.android.material.snackbar.Snackbar;
-
 import java.util.Calendar;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button toast, snakbar, datePicker, dialog;
+    private Button toast, snakbar, datePicker, dialog, speakButton;
+    private EditText speakText;
+    private TextToSpeech tts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
         snakbar     = findViewById(R.id.snakbar);
         datePicker  = findViewById(R.id.datePicker);
         dialog      = findViewById(R.id.dialog);
+        speakButton = findViewById(R.id.speakButton);
+        speakText   = findViewById(R.id.speakText);
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
@@ -50,6 +55,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Date picker event with Calender class object to fetch current date
+
         datePicker.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -70,6 +77,8 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        // Dialog to show exit pop-up
 
         dialog.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,5 +108,39 @@ public class MainActivity extends AppCompatActivity {
                 alert.show();
             }
         });
+
+        // Text-to-speech onclick listner
+
+        tts = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if(status != TextToSpeech.ERROR) {
+                    tts.setLanguage(Locale.US);
+                }
+            }
+        });
+
+        speakButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String speakingText = speakText.getText().toString();
+                if (speakingText.isEmpty()){
+                    speakText.setError("Enter something");
+                    speakText.requestFocusFromTouch();
+                }
+                tts.speak(speakingText, TextToSpeech.QUEUE_FLUSH, null);
+
+
+
+            }
+        });
+    }
+
+    public void onPause(){
+        if(tts !=null){
+            tts.stop();
+            tts.shutdown();
+        }
+        super.onPause();
     }
 }
