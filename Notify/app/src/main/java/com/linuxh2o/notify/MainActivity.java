@@ -4,10 +4,18 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.NetworkInfo.State;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -19,9 +27,10 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button toast, snakbar, datePicker, dialog, speakButton;
+    private Button toast, snakbar, datePicker, dialog, speakButton, listView, broadcast;
     private EditText speakText;
     private TextToSpeech tts;
+    private BroadcastReceiver broadcastReceiver = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +43,8 @@ public class MainActivity extends AppCompatActivity {
         dialog      = findViewById(R.id.dialog);
         speakButton = findViewById(R.id.speakButton);
         speakText   = findViewById(R.id.speakText);
+        listView    = findViewById(R.id.showListView);
+        broadcast   = findViewById(R.id.broadcast);
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
@@ -134,6 +145,47 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        // ListView Example
+
+        listView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent i = new Intent(getApplicationContext(), ListViewActivity.class);
+                startActivity(i);
+
+            }
+        });
+
+        // Broadcasting message
+
+        broadcast.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                broadcastReceiver = new BroadcastReceiver() {
+                    @Override
+                    public void onReceive(Context context, Intent intent) {
+                        Bundle bundle = intent.getExtras();
+
+                        NetworkInfo info = bundle.getParcelable("networkInfo");
+                        State state = info.getState();
+
+                        if (state == NetworkInfo.State.CONNECTED){
+                            Toast.makeText(getApplicationContext(), "Network is connected", Toast.LENGTH_SHORT).show();
+                        }else {
+                            Toast.makeText(getApplicationContext(), "No connectivity", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                };
+
+                final IntentFilter intentFilter = new IntentFilter();
+                intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+                registerReceiver(broadcastReceiver, intentFilter);
+
+            }
+        });
     }
 
     public void onPause(){
@@ -142,5 +194,15 @@ public class MainActivity extends AppCompatActivity {
             tts.shutdown();
         }
         super.onPause();
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+
+        speakText.setError(null);
+        speakText.clearFocus();
+        Toast.makeText(this, "OnTouch()", Toast.LENGTH_SHORT).show();
+
+        return true;
     }
 }
